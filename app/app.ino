@@ -1,3 +1,6 @@
+
+
+
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
@@ -16,9 +19,9 @@
 static bool messagePending = false;
 static bool messageSending = true;
 
-static char *connectionString;
-static char *ssid;
-static char *pass;
+static char *connectionString = "HostName=iothub-clem.azure-devices.net;DeviceId=touchdevice;SharedAccessKey=qrhO6Waswmk1fRjQFdH5VbIQwiG9EOtuUcPBcVX6wco=";
+static char *ssid = "iot";
+static char *pass = "";
 
 static int interval = INTERVAL;
 
@@ -48,6 +51,7 @@ void initWifi()
         WiFi.begin(ssid, pass);
         delay(10000);
     }
+//    Serial.printf(Wifi.macAddress(mac));
     Serial.printf("Connected to wifi %s.\r\n", ssid);
 }
 
@@ -113,6 +117,7 @@ void loop()
         char messagePayload[MESSAGE_MAX_LEN];
         bool temperatureAlert = readMessage(messageCount, messagePayload);
         sendMessage(iotHubClientHandle, messagePayload, temperatureAlert);
+        Serial.printf("Sending message now");
         messageCount++;
         delay(interval);
     }
