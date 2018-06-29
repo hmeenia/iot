@@ -1,6 +1,7 @@
 
 
 
+
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
@@ -15,6 +16,7 @@
 #include <AzureIoTUtility.h>
 
 #include "config.h"
+
 
 static bool messagePending = false;
 static bool messageSending = true;
@@ -80,15 +82,12 @@ void initTime()
 static IOTHUB_CLIENT_LL_HANDLE iotHubClientHandle;
 void setup()
 {
-    pinMode(LED_PIN, OUTPUT);
-
     initSerial();
     delay(2000);
     readCredentials();
 
     initWifi();
     initTime();
-    initSensor();
 
     /*
      * AzureIotHub library remove AzureIoTHubClient class in 1.0.34, so we remove the code below to avoid
@@ -115,12 +114,10 @@ void loop()
     if (!messagePending && messageSending)
     {
         char messagePayload[MESSAGE_MAX_LEN];
-        bool temperatureAlert = readMessage(messageCount, messagePayload);
-        sendMessage(iotHubClientHandle, messagePayload, temperatureAlert);
-        Serial.printf("Sending message now");
+        bool BPMAleart = readMessage(messageCount, messagePayload);
+        sendMessage(iotHubClientHandle, messagePayload, BPMAleart);
         messageCount++;
-        delay(interval);
+
     }
     IoTHubClient_LL_DoWork(iotHubClientHandle);
-    delay(10);
 }

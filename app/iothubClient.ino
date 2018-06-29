@@ -34,7 +34,7 @@ static void sendCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result, void *userCon
     if (IOTHUB_CLIENT_CONFIRMATION_OK == result)
     {
         Serial.println("Message sent to Azure IoT Hub");
-        blinkLED();
+        // blinkLED();
     }
     else
     {
@@ -43,7 +43,7 @@ static void sendCallback(IOTHUB_CLIENT_CONFIRMATION_RESULT result, void *userCon
     messagePending = false;
 }
 
-static void sendMessage(IOTHUB_CLIENT_LL_HANDLE iotHubClientHandle, char *buffer, bool temperatureAlert)
+static void sendMessage(IOTHUB_CLIENT_LL_HANDLE iotHubClientHandle, char *buffer, bool bpmAlert)
 {
     IOTHUB_MESSAGE_HANDLE messageHandle = IoTHubMessage_CreateFromByteArray((const unsigned char *)buffer, strlen(buffer));
     if (messageHandle == NULL)
@@ -53,7 +53,7 @@ static void sendMessage(IOTHUB_CLIENT_LL_HANDLE iotHubClientHandle, char *buffer
     else
     {
         MAP_HANDLE properties = IoTHubMessage_Properties(messageHandle);
-        Map_Add(properties, "temperatureAlert", temperatureAlert ? "true" : "false");
+        Map_Add(properties, "BPMAlert", bpmAlert ? "true" : "false");
         Serial.printf("Sending message: %s.\r\n", buffer);
         if (IoTHubClient_LL_SendEventAsync(iotHubClientHandle, messageHandle, sendCallback, NULL) != IOTHUB_CLIENT_OK)
         {
@@ -105,7 +105,7 @@ IOTHUBMESSAGE_DISPOSITION_RESULT receiveMessageCallback(IOTHUB_MESSAGE_HANDLE me
         temp[size] = '\0';
         Serial.printf("Receive C2D message: %s.\r\n", temp);
         free(temp);
-        blinkLED();
+        // blinkLED();
     }
     return IOTHUBMESSAGE_ACCEPTED;
 }

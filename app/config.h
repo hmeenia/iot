@@ -1,18 +1,22 @@
 // Physical device information for board and sensor
 #define DEVICE_ID "Feather HUZZAH ESP8266 WiFi"
-#define DHT_TYPE DHT22
+
 
 // Pin layout configuration
 #define LED_PIN 0
-#define DHT_PIN 2
+#define PULSE_ANALOG_READ_PIN 17
 
-#define TEMPERATURE_ALERT 30
+
+#define MIN_THRESHOLD 500
+#define MAX_THRESHOLD 570
+
+#define BPM_ALERT 200
 
 // Interval time(ms) for sending message to IoT Hub
-#define INTERVAL 2000
+#define INTERVAL 0
 
 // If don't have a physical DHT sensor, can send simulated data to IoT hub
-#define SIMULATED_DATA true
+#define SIMULATED_DATA false
 
 // EEPROM address configuration
 #define EEPROM_SIZE 512

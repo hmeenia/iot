@@ -1,78 +1,82 @@
 #include <Adafruit_Sensor.h>
 #include <ArduinoJson.h>
-#include <DHT.h>
+     // Includes the PulseSensorPlayground Library.   
 
-#if SIMULATED_DATA
+// #define USE_ARDUINO_INTERRUPTS true    // Set-up low-level interrupts for most acurate BPM math.
+// #include <PulseSensorPlayground.h>
 
-void initSensor()
-{
-    // use SIMULATED_DATA, no sensor need to be inited
+// static PulseSensorPlayground psp;
+// void initSensor()
+// {   
+//     psp.analogInput(PULSE_ANALOG_READ_PIN);   
+//     psp.blinkOnPulse(LED_PIN);       
+//     psp.setThreshold(PULSE_THRESHOLD_SENSOR);       
+//     if (psp.begin()) {
+//         Serial.println("We created a pulseSensor Object !");  //This prints one time at Arduino power-up,  or on Arduino reset.  
+//     }
+// }
+
+// float readBPM()
+// {
+//     return psp.getBeatsPerMinute();
+// }
+    int reading = 0;
+    float BPM = 0.0;
+    bool IgnoreReading = false;
+    bool FirstPulseDetected = false;
+    unsigned long FirstPulseTime = 0;
+    unsigned long SecondPulseTime = 0;
+    unsigned long PulseInterval = 0;                               
+float readBPM() {
+      reading = analogRead(A0);
+      // Heart beat leading edge detected.
+      if(reading > MAX_THRESHOLD && IgnoreReading == false){
+        if(FirstPulseDetected == false){
+          FirstPulseTime = millis();
+          FirstPulseDetected = true;
+        }
+        else{
+          SecondPulseTime = millis();
+          PulseInterval = SecondPulseTime - FirstPulseTime;
+          FirstPulseTime = SecondPulseTime;
+        }
+        IgnoreReading = true;
+      }
+
+      // Heart beat trailing edge detected.
+      if(reading < MIN_THRESHOLD){
+        IgnoreReading = false;
+      }  
+
+      BPM = (1.0/PulseInterval) * 60.0 * 1000;    
+      return BPM;
 }
-
-float readTemperature()
-{
-    return random(20, 30);
-}
-
-float readHumidity()
-{
-    return random(30, 40);
-}
-
-#else
-
-static DHT dht(DHT_PIN, DHT_TYPE);
-void initSensor()
-{
-    dht.begin();
-}
-
-float readTemperature()
-{
-    return dht.readTemperature();
-}
-
-float readHumidity()
-{
-    return dht.readHumidity();
-}
-
-#endif
 
 bool readMessage(int messageId, char *payload)
 {
-    float temperature = readTemperature();
-    float humidity = readHumidity();
+    float bpm = readBPM();
     StaticJsonBuffer<MESSAGE_MAX_LEN> jsonBuffer;
     JsonObject &root = jsonBuffer.createObject();
     root["deviceId"] = DEVICE_ID;
     root["messageId"] = messageId;
-    bool temperatureAlert = false;
+    bool BPMAleart = false;
 
     // NAN is not the valid json, change it to NULL
-    if (std::isnan(temperature))
+    if (std::isnan(bpm))
     {
-        root["temperature"] = NULL;
+        root["BPM"] = NULL;
     }
     else
     {
-        root["temperature"] = temperature;
-        if (temperature > TEMPERATURE_ALERT)
+        root["BPM"] = bpm;
+        if (bpm > BPM_ALERT)
         {
-            temperatureAlert = true;
+            BPMAleart = true;
         }
     }
 
-    if (std::isnan(humidity))
-    {
-        root["humidity"] = NULL;
-    }
-    else
-    {
-        root["humidity"] = humidity;
-    }
     root.printTo(payload, MESSAGE_MAX_LEN);
-    return temperatureAlert;
+    return BPMAleart;
 }
 
 void parseTwinMessage(char *message)
