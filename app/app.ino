@@ -21,7 +21,7 @@
 static bool messagePending = false;
 static bool messageSending = true;
 
-static char *connectionString = "HostName=iothub-clem.azure-devices.net;DeviceId=touchdevice;SharedAccessKey=qrhO6Waswmk1fRjQFdH5VbIQwiG9EOtuUcPBcVX6wco=";
+static char *connectionString = "HostName=hmeenia-test.azure-devices.net;DeviceId=hmeenia-desk;SharedAccessKey=/j3NGMyfZstwigwFqAyMLZiRr/iFpV5wb4ausoS83WA=";
 static char *ssid = "iot";
 static char *pass = "";
 
@@ -84,7 +84,7 @@ void setup()
 {
     initSerial();
     delay(2000);
-    readCredentials();
+//    readCredentials();
 
     initWifi();
     initTime();
